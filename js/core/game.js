@@ -5,16 +5,19 @@
 
 // Wait for the DOM to be loaded
 document.addEventListener('DOMContentLoaded', function () {
-    // Create a new Phaser game instance
-    const game = new Phaser.Game(CONFIG.phaser);
+    // Make sure CONFIG is defined before using it
+    if (typeof CONFIG !== 'undefined') {
+        // Create a new Phaser game instance
+        const game = new Phaser.Game(CONFIG.phaser);
 
-    // Store global game reference
-    window.game = game;
+        // Store global game reference
+        window.game = game;
 
-    // Initialize any game-wide systems here
-
-    // Log game initialization
-    console.log('Grid World game initialized');
+        // Log game initialization
+        console.log('Grid World game initialized');
+    } else {
+        console.error('Game configuration not loaded. Make sure config.js is loaded before game.js');
+    }
 });
 
 /**

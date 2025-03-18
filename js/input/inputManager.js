@@ -15,6 +15,9 @@ class InputManager {
         this.previousKeyStates = {};
         this.keyCallbacks = {};
 
+        // Debug flag
+        this.debug = CONFIG.game.debug.logEvents;
+
         // Initialize
         this.init();
     }
@@ -23,48 +26,72 @@ class InputManager {
      * Initialize the input manager
      */
     init() {
+        console.log("Initializing InputManager");
+
         // Set up Phaser input
         this.setupKeys();
+
+        // Add event listeners for logging key events
+        if (this.debug) {
+            window.addEventListener('keydown', (e) => {
+                console.log(`Key Down: ${e.key} (KeyCode: ${e.keyCode})`);
+            });
+        }
     }
 
     /**
      * Set up input key handling
      */
     setupKeys() {
+        console.log("Setting up keys in InputManager");
+
         // Get the keyboard from Phaser
         this.keyboard = this.scene.input.keyboard;
 
-        // Define key mappings
+        if (!this.keyboard) {
+            console.error("Keyboard not available in scene");
+            return;
+        }
+
+        // Define key mappings - using KeyCodes to ensure consistent behavior
         const keyMapping = {
-            [CONSTANTS.KEYS.UP]: 'W',
-            [CONSTANTS.KEYS.DOWN]: 'S',
-            [CONSTANTS.KEYS.LEFT]: 'A',
-            [CONSTANTS.KEYS.RIGHT]: 'D',
-            [CONSTANTS.KEYS.INTERACT]: 'E'
+            [CONSTANTS.KEYS.UP]: Phaser.Input.Keyboard.KeyCodes.W,
+            [CONSTANTS.KEYS.DOWN]: Phaser.Input.Keyboard.KeyCodes.S,
+            [CONSTANTS.KEYS.LEFT]: Phaser.Input.Keyboard.KeyCodes.A,
+            [CONSTANTS.KEYS.RIGHT]: Phaser.Input.Keyboard.KeyCodes.D,
+            [CONSTANTS.KEYS.INTERACT]: Phaser.Input.Keyboard.KeyCodes.E
         };
 
-        // Create key objects
+        // Create key objects and log them
         for (const key in keyMapping) {
             this.keys[key] = this.keyboard.addKey(keyMapping[key]);
             this.keyStates[key] = false;
             this.previousKeyStates[key] = false;
+
+            console.log(`Added key: ${key} (KeyCode: ${keyMapping[key]})`);
         }
 
-        // Add key event listeners
-        this.keyboard.on('keydown', this.handleKeyDown.bind(this));
-        this.keyboard.on('keyup', this.handleKeyUp.bind(this));
+        // Setup direct key listeners for proper detection
+        this.keyboard.on('keydown', this.handleKeyDown, this);
+        this.keyboard.on('keyup', this.handleKeyUp, this);
+
+        console.log("Input keys setup complete");
     }
 
     /**
      * Handle key down event
      *
-     * @param {Object} event - Key event
+     * @param {KeyboardEvent} event - Key event
      */
     handleKeyDown(event) {
         // Convert key code to our key constant
-        const key = this.getKeyConstant(event.key);
+        const key = this.getKeyConstant(event.keyCode);
 
         if (key) {
+            if (this.debug) {
+                console.log(`Key down detected: ${key} (KeyCode: ${event.keyCode})`);
+            }
+
             this.keyStates[key] = true;
 
             // Call any registered callbacks
@@ -77,13 +104,17 @@ class InputManager {
     /**
      * Handle key up event
      *
-     * @param {Object} event - Key event
+     * @param {KeyboardEvent} event - Key event
      */
     handleKeyUp(event) {
         // Convert key code to our key constant
-        const key = this.getKeyConstant(event.key);
+        const key = this.getKeyConstant(event.keyCode);
 
         if (key) {
+            if (this.debug) {
+                console.log(`Key up detected: ${key} (KeyCode: ${event.keyCode})`);
+            }
+
             this.keyStates[key] = false;
 
             // Call any registered callbacks
@@ -96,21 +127,20 @@ class InputManager {
     /**
      * Convert a key code to our key constant
      *
-     * @param {string} keyCode - The key code
+     * @param {number} keyCode - The key code
      * @returns {string|null} Our key constant or null if not mapped
      */
     getKeyConstant(keyCode) {
-        // Convert to uppercase for consistency
-        const upperKey = keyCode.toUpperCase();
+        // Map key codes to our constants
+        const keyCodeMap = {
+            87: 'UP',    // W
+            83: 'DOWN',  // S
+            65: 'LEFT',  // A
+            68: 'RIGHT', // D
+            69: 'INTERACT' // E
+        };
 
-        // Find the matching key constant
-        for (const key in CONSTANTS.KEYS) {
-            if (CONSTANTS.KEYS[key] === upperKey) {
-                return key;
-            }
-        }
-
-        return null;
+        return keyCodeMap[keyCode] || null;
     }
 
     /**
@@ -120,7 +150,17 @@ class InputManager {
      * @returns {boolean} Whether the key is down
      */
     isKeyDown(key) {
-        return this.keyStates[key] === true;
+        // First check our internal state (from event listeners)
+        if (this.keyStates[key] === true) {
+            return true;
+        }
+
+        // Then also check Phaser's key state as a backup
+        if (this.keys[key] && this.keys[key].isDown) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
@@ -173,10 +213,35 @@ class InputManager {
     }
 
     /**
+     * Log the current state of all keys
+     */
+    logKeyStates() {
+        console.log("Current key states:");
+        for (const key in this.keyStates) {
+            console.log(`${key}: ${this.keyStates[key]}`);
+        }
+
+        console.log("Phaser key states:");
+        for (const key in this.keys) {
+            if (this.keys[key]) {
+                console.log(`${key}: ${this.keys[key].isDown}`);
+            }
+        }
+    }
+
+    /**
      * Update the input manager
      * Should be called once per frame in the scene's update
      */
     update() {
+        // Check direct key states from Phaser as a backup
+        // This ensures we catch keys even if the event listeners missed them
+        for (const key in this.keys) {
+            if (this.keys[key] && this.keys[key].isDown) {
+                this.keyStates[key] = true;
+            }
+        }
+
         // Store the current key states for "just pressed/released" detection
         for (const key in this.keyStates) {
             this.previousKeyStates[key] = this.keyStates[key];

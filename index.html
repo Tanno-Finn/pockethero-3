@@ -11,11 +11,12 @@
 <body>
 <div id="game-container"></div>
 
+<!-- Load order is important to resolve dependencies -->
+
 <!-- Core -->
 <script src="js/core/constants.js"></script>
-<script src="js/core/config.js"></script>
 
-<!-- Utils -->
+<!-- Utils - need to be loaded early as many components depend on them -->
 <script src="js/utils/helpers.js"></script>
 <script src="js/utils/math.js"></script>
 
@@ -24,22 +25,16 @@
 <script src="js/data/dataLoader.js"></script>
 <script src="js/data/dataManager.js"></script>
 
+<!-- Interactions System - lower level components first -->
+<script src="js/interactions/eventSystem.js"></script>
+<script src="js/interactions/interaction.js"></script>
+<script src="js/interactions/dialog.js"></script>
+
 <!-- World System -->
 <script src="js/world/tile.js"></script>
 <script src="js/world/grid.js"></script>
 <script src="js/world/zone.js"></script>
 <script src="js/world/teleporter.js"></script>
-
-<!-- Entity System -->
-<script src="js/entities/entity.js"></script>
-<script src="js/entities/player.js"></script>
-<script src="js/entities/npc.js"></script>
-<script src="js/entities/item.js"></script>
-
-<!-- Interaction System -->
-<script src="js/interactions/interaction.js"></script>
-<script src="js/interactions/dialog.js"></script>
-<script src="js/interactions/eventSystem.js"></script>
 
 <!-- Rendering -->
 <script src="js/rendering/shapeFactory.js"></script>
@@ -49,12 +44,42 @@
 <!-- Input -->
 <script src="js/input/inputManager.js"></script>
 
-<!-- Scenes -->
+<!-- Entity System - base classes first -->
+<script src="js/entities/entity.js"></script>
+<script src="js/entities/player.js"></script>
+<script src="js/entities/npc.js"></script>
+<script src="js/entities/item.js"></script>
+
+<!-- Scenes - These need all the above components -->
 <script src="js/scenes/bootScene.js"></script>
 <script src="js/scenes/gameScene.js"></script>
 <script src="js/scenes/uiScene.js"></script>
 
-<!-- Main Game -->
+<!-- Config - Needs all scene references -->
+<script src="js/core/config.js"></script>
+
+
+<script>
+  async function testDataFiles() {
+    const files = [
+      'data/zones/index.json',
+      'data/zones/demo_zones.json'
+    ];
+
+    for (const file of files) {
+      try {
+        const response = await fetch(file);
+        const data = await response.json();
+        console.log(`Successfully loaded ${file}:`, data);
+      } catch (error) {
+        console.error(`Failed to load ${file}:`, error);
+      }
+    }
+  }
+  testDataFiles();
+</script>
+
+<!-- Main Game - Load this last -->
 <script src="js/core/game.js"></script>
 </body>
 </html>

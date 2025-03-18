@@ -33,13 +33,17 @@ class DataLoader {
      * @returns {Promise} Promise that resolves with the loaded data
      */
     load(path) {
+        console.log(`Attempting to load: ${path}`);
+
         // Check if already cached
         if (this.cache[path]) {
+            console.log(`Using cached data for: ${path}`);
             return Promise.resolve(this.cache[path]);
         }
 
         // Check if already loading
         if (this.loading.has(path)) {
+            console.log(`Already loading: ${path}`);
             return new Promise((resolve, reject) => {
                 // Poll until the file is loaded
                 const checkLoaded = () => {
@@ -59,28 +63,15 @@ class DataLoader {
         // Mark as loading
         this.loading.add(path);
 
-        // Load the file
-        return new Promise((resolve, reject) => {
-            // Use Phaser's loader
-            if (!this.scene.load) {
-                reject(new Error('Scene loader not available'));
-                return;
-            }
-
-            const key = `data_${path.replace(/[^\w]/g, '_')}`;
-
-            this.scene.load.json(key, path);
-
-            this.scene.load.once('complete', () => {
-                // Get the data from the cache
-                const data = this.scene.cache.json.get(key);
-
-                if (!data) {
-                    this.loading.delete(path);
-                    reject(new Error(`Failed to load data from ${path}`));
-                    return;
+        // Use fetch API instead of Phaser's loader
+        return fetch(path)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`HTTP error ${response.status} while loading ${path}`);
                 }
-
+                return response.json();
+            })
+            .then(data => {
                 // Cache the data
                 this.cache[path] = data;
 
@@ -88,21 +79,17 @@ class DataLoader {
                 this.loading.delete(path);
                 this.loaded.add(path);
 
-                resolve(data);
-            });
+                console.log(`Successfully loaded data from ${path}`, data);
+                return data;
+            })
+            .catch(error => {
+                console.error(`Error loading ${path}:`, error);
 
-            this.scene.load.once('loaderror', () => {
+                // Clean up
                 this.loading.delete(path);
-                reject(new Error(`Failed to load ${path}`));
-            });
 
-            // Start loading if not already started
-            if (this.scene.load.isLoading()) {
-                // Already loading, the callbacks will be triggered
-            } else {
-                this.scene.load.start();
-            }
-        });
+                throw error;
+            });
     }
 
     /**

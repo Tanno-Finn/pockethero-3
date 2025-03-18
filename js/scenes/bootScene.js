@@ -98,6 +98,8 @@ class BootScene extends Phaser.Scene {
      * Create the boot scene
      */
     create() {
+        console.log("BootScene create method called");
+
         // Create any boot scene content
 
         // Set up data structures
@@ -111,12 +113,20 @@ class BootScene extends Phaser.Scene {
      * Set up data structures
      */
     setupDataStructures() {
+        console.log("Setting up data structures");
+
         // Create event system and add to registry for global access
-        this.game.registry.set('events', new EventSystem());
+        const eventSystem = new EventSystem();
+        eventSystem.addPhaserCompatibility();
+        this.game.registry.set('events', eventSystem);
 
         // Set up data manager
-        this.dataManager = new DataManager(this);
-        this.game.registry.set('dataManager', this.dataManager);
+        try {
+            this.dataManager = new DataManager(this);
+            this.game.registry.set('dataManager', this.dataManager);
+        } catch (error) {
+            console.error("Error setting up data manager:", error);
+        }
     }
 
     /**
@@ -135,6 +145,9 @@ class BootScene extends Phaser.Scene {
             .catch(error => {
                 console.error('Error loading game data:', error);
                 this.loadingText.setText('Error Loading Game Data');
+
+                // Try to start the game anyway to see what happens
+                this.startGame();
             });
     }
 
@@ -142,6 +155,8 @@ class BootScene extends Phaser.Scene {
      * Start the game
      */
     startGame() {
+        console.log("Starting game - launching main scenes");
+
         // Switch to the main game scene
         this.scene.start(CONSTANTS.SCENES.GAME);
 

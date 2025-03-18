@@ -58,6 +58,19 @@ class Camera {
      * @param {Object} grid - The grid to set bounds from
      */
     setBoundsToGrid(grid) {
+        // Check if grid is valid
+        if (!grid) {
+            console.warn("Cannot set camera bounds: grid is null or undefined");
+            // Set default bounds to prevent errors
+            this.setBounds(
+                0,
+                0,
+                CONFIG.phaser.width,
+                CONFIG.phaser.height
+            );
+            return;
+        }
+
         this.setBounds(
             0,
             0,

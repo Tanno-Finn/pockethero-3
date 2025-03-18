@@ -45,7 +45,22 @@ class DataManager {
             this.loadEntities(),
             this.loadZones(),
             this.loadInteractions()
-        ]);
+        ]).then(() => {
+            // Debug: Log what's in the data caches
+            console.log("LOADED DATA SUMMARY:");
+            console.log("Tiles:", Object.keys(this.tiles));
+            console.log("Entities:", Object.keys(this.entities));
+            console.log("Zones:", Object.keys(this.zones));
+            console.log("Interactions:", Object.keys(this.interactions));
+
+            // Return the loaded data
+            return {
+                tiles: this.tiles,
+                entities: this.entities,
+                zones: this.zones,
+                interactions: this.interactions
+            };
+        });
     }
 
     /**
@@ -54,6 +69,7 @@ class DataManager {
      * @returns {Promise} Promise that resolves when tiles are loaded
      */
     loadTiles() {
+        console.log("Loading tiles from path:", CONSTANTS.DATA_PATHS.TILES);
         return this.loadDataFiles(CONSTANTS.DATA_PATHS.TILES, 'tile', this.tiles);
     }
 
@@ -63,6 +79,7 @@ class DataManager {
      * @returns {Promise} Promise that resolves when entities are loaded
      */
     loadEntities() {
+        console.log("Loading entities from path:", CONSTANTS.DATA_PATHS.ENTITIES);
         return this.loadDataFiles(CONSTANTS.DATA_PATHS.ENTITIES, 'entity', this.entities);
     }
 
@@ -72,6 +89,7 @@ class DataManager {
      * @returns {Promise} Promise that resolves when zones are loaded
      */
     loadZones() {
+        console.log("Loading zones from path:", CONSTANTS.DATA_PATHS.ZONES);
         return this.loadDataFiles(CONSTANTS.DATA_PATHS.ZONES, 'zone', this.zones);
     }
 
@@ -81,6 +99,7 @@ class DataManager {
      * @returns {Promise} Promise that resolves when interactions are loaded
      */
     loadInteractions() {
+        console.log("Loading interactions from path:", CONSTANTS.DATA_PATHS.INTERACTIONS);
         return this.loadDataFiles(CONSTANTS.DATA_PATHS.INTERACTIONS, 'interaction', this.interactions);
     }
 
@@ -93,37 +112,60 @@ class DataManager {
      * @returns {Promise} Promise that resolves when data is loaded
      */
     loadDataFiles(basePath, dataType, targetCache) {
-        // Load the index file first
-        return this.loader.load(`${basePath}index.json`)
+        // Log the base path
+        console.log(`Attempting to load ${dataType} data from ${basePath}`);
+
+        // First check if the index file exists
+        return fetch(basePath + 'index.json')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Index file not found at ${basePath}index.json (${response.status})`);
+                }
+                return response.json();
+            })
             .then(indexData => {
+                console.log(`Successfully loaded index for ${dataType}:`, indexData);
+
                 if (!Array.isArray(indexData.files)) {
-                    throw new Error(`Invalid index file at ${basePath}index.json`);
+                    throw new Error(`Invalid index file at ${basePath}index.json - no files array`);
                 }
 
                 // Load each file in the index
                 const promises = indexData.files.map(filename => {
                     const path = `${basePath}${filename}`;
+                    console.log(`Loading ${dataType} file: ${path}`);
 
-                    return this.loader.load(path)
+                    return fetch(path)
+                        .then(response => {
+                            if (!response.ok) {
+                                throw new Error(`File not found: ${path} (${response.status})`);
+                            }
+                            return response.json();
+                        })
                         .then(data => {
+                            console.log(`Successfully loaded data from ${path}:`, data);
+
                             // Validate the data
-                            if (!this.loader.validate(data, dataType)) {
-                                console.warn(`Invalid ${dataType} data in ${path}`);
+                            const isValid = this.loader.validate(data, dataType);
+                            if (!isValid) {
+                                console.warn(`Invalid ${dataType} data in ${path}:`, Validator.getErrors());
                                 return;
                             }
 
-                            // Store in the appropriate cache
+                            // Process the data based on its structure
                             if (Array.isArray(data)) {
-                                // If it's an array, process each item
+                                // Process each item in the array
                                 data.forEach(item => {
                                     if (item.id) {
+                                        console.log(`Adding ${dataType} to cache: ${item.id}`);
                                         targetCache[item.id] = item;
                                     } else {
                                         console.warn(`Item without id in ${path}`);
                                     }
                                 });
                             } else if (data.id) {
-                                // If it's a single object with an id
+                                // It's a single object with an id
+                                console.log(`Adding single ${dataType} to cache: ${data.id}`);
                                 targetCache[data.id] = data;
                             } else {
                                 console.warn(`Data without id in ${path}`);
@@ -149,7 +191,11 @@ class DataManager {
      * @returns {Object|null} Tile definition or null if not found
      */
     getTile(id) {
-        return this.tiles[id] || null;
+        const tile = this.tiles[id] || null;
+        if (!tile) {
+            console.warn(`Tile not found: ${id}. Available tiles:`, Object.keys(this.tiles));
+        }
+        return tile;
     }
 
     /**
@@ -159,7 +205,11 @@ class DataManager {
      * @returns {Object|null} Entity definition or null if not found
      */
     getEntity(id) {
-        return this.entities[id] || null;
+        const entity = this.entities[id] || null;
+        if (!entity) {
+            console.warn(`Entity not found: ${id}. Available entities:`, Object.keys(this.entities));
+        }
+        return entity;
     }
 
     /**
@@ -169,7 +219,11 @@ class DataManager {
      * @returns {Object|null} Zone definition or null if not found
      */
     getZone(id) {
-        return this.zones[id] || null;
+        const zone = this.zones[id] || null;
+        if (!zone) {
+            console.warn(`Zone not found: ${id}. Available zones:`, Object.keys(this.zones));
+        }
+        return zone;
     }
 
     /**
@@ -179,7 +233,11 @@ class DataManager {
      * @returns {Object|null} Interaction definition or null if not found
      */
     getInteraction(id) {
-        return this.interactions[id] || null;
+        const interaction = this.interactions[id] || null;
+        if (!interaction) {
+            console.warn(`Interaction not found: ${id}. Available interactions:`, Object.keys(this.interactions));
+        }
+        return interaction;
     }
 
     /**
@@ -269,5 +327,17 @@ class DataManager {
             default:
                 return new Entity(scene, config);
         }
+    }
+
+    /**
+     * Debug method to log the content of all data caches
+     */
+    logDataCaches() {
+        console.log("=== DATA CACHE CONTENTS ===");
+        console.log("Tiles:", this.tiles);
+        console.log("Entities:", this.entities);
+        console.log("Zones:", this.zones);
+        console.log("Interactions:", this.interactions);
+        console.log("=========================");
     }
 }

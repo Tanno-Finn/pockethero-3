@@ -60,35 +60,5 @@
     "properties": {
       "value": 5
     }
-  },
-  {
-    "id": "key",
-    "displayName": "Key",
-    "type": "item",
-    "color": "#FFFF00",
-    "shape": "rectangle",
-    "size": 0.5,
-    "interactable": true,
-    "pickupable": true,
-    "tags": ["item", "collectible", "key"],
-    "dialogOnPickup": "You found a key! This might open something.",
-    "properties": {
-      "value": 10
-    }
-  },
-  {
-    "id": "chest",
-    "displayName": "Treasure Chest",
-    "type": "furniture",
-    "color": "#A0522D",
-    "shape": "rectangle",
-    "size": 0.8,
-    "interactable": true,
-    "tags": ["furniture", "container"],
-    "interactionDirections": ["north", "east", "south", "west"],
-    "properties": {
-      "isOpen": false,
-      "contents": ["key"]
-    }
   }
 ]

@@ -31,6 +31,16 @@ class Player extends Entity {
         // Input movement cooldown
         this.moveCooldown = 0;
         this.moveCooldownDuration = 200; // ms between moves
+
+        // Debug mode
+        this.debug = CONFIG.game.debug.showEntityInfo;
+
+        console.log("Player initialized with properties:", {
+            position: this.position,
+            direction: this.direction,
+            moveSpeed: this.moveSpeed,
+            cooldownDuration: this.moveCooldownDuration
+        });
     }
 
     /**
@@ -65,21 +75,41 @@ class Player extends Entity {
     handleInput(input) {
         // Only process input if cooldown is finished
         if (this.moveCooldown <= 0) {
-            // Movement
-            if (input.isKeyDown(CONSTANTS.KEYS.UP)) {
-                this.move(CONSTANTS.DIRECTIONS.NORTH);
-            } else if (input.isKeyDown(CONSTANTS.KEYS.RIGHT)) {
-                this.move(CONSTANTS.DIRECTIONS.EAST);
-            } else if (input.isKeyDown(CONSTANTS.KEYS.DOWN)) {
-                this.move(CONSTANTS.DIRECTIONS.SOUTH);
-            } else if (input.isKeyDown(CONSTANTS.KEYS.LEFT)) {
-                this.move(CONSTANTS.DIRECTIONS.WEST);
+            // Log key states for debugging
+            if (this.debug) {
+                console.log("Checking player input:");
+                input.logKeyStates();
             }
 
-            // Interaction
+            let moved = false;
+
+            // Check all movement keys
+            if (input.isKeyDown(CONSTANTS.KEYS.UP)) {
+                console.log("Up key detected, moving north");
+                moved = this.move(CONSTANTS.DIRECTIONS.NORTH);
+            } else if (input.isKeyDown(CONSTANTS.KEYS.RIGHT)) {
+                console.log("Right key detected, moving east");
+                moved = this.move(CONSTANTS.DIRECTIONS.EAST);
+            } else if (input.isKeyDown(CONSTANTS.KEYS.DOWN)) {
+                console.log("Down key detected, moving south");
+                moved = this.move(CONSTANTS.DIRECTIONS.SOUTH);
+            } else if (input.isKeyDown(CONSTANTS.KEYS.LEFT)) {
+                console.log("Left key detected, moving west");
+                moved = this.move(CONSTANTS.DIRECTIONS.WEST);
+            }
+
+            // Check for interaction
             if (input.isKeyDown(CONSTANTS.KEYS.INTERACT)) {
+                console.log("Interact key detected");
                 this.interact();
             }
+
+            // Log movement result
+            if (this.debug && !moved) {
+                console.log("No movement occurred - cooldown:", this.moveCooldown);
+            }
+        } else if (this.debug) {
+            console.log("Player movement on cooldown:", this.moveCooldown);
         }
     }
 
@@ -97,6 +127,8 @@ class Player extends Entity {
         const moved = this.moveInDirection(direction);
 
         if (moved) {
+            console.log(`Player moved ${direction} to position:`, this.position);
+
             // Reset cooldown
             this.moveCooldown = this.moveCooldownDuration;
 
@@ -109,6 +141,8 @@ class Player extends Entity {
 
             // Check for teleporters
             this.checkTeleporter();
+        } else {
+            console.log(`Player could not move ${direction} from position:`, this.position);
         }
 
         return moved;
@@ -126,6 +160,12 @@ class Player extends Entity {
             const targetX = tile.properties.targetX;
             const targetY = tile.properties.targetY;
 
+            console.log("Player on teleporter, destination:", {
+                zone: targetZone,
+                x: targetX,
+                y: targetY
+            });
+
             // Trigger zone change
             if (targetZone && targetX !== undefined && targetY !== undefined) {
                 this.scene.changeZone(targetZone, targetX, targetY);
@@ -142,20 +182,28 @@ class Player extends Entity {
         // Get position in front of player
         const frontPos = Helpers.getPositionInFront(this);
 
+        console.log(`Checking for interaction at position:`, frontPos);
+
         // Get entity at that position
         const entity = this.scene.getEntityAt(frontPos.x, frontPos.y);
 
         // Check if there's an interactable entity
         if (entity && entity.interactable) {
+            console.log(`Found interactable entity: ${entity.displayName}`);
+
             // Get opposite direction (entity is in front, so we're approaching from opposite side)
             const interactDirection = this.getOppositeDirection(this.direction);
 
             // Check if we can interact from this direction
             if (entity.canInteractFrom(interactDirection)) {
+                console.log(`Interacting with ${entity.displayName} from ${interactDirection}`);
+
                 // Trigger the interaction
                 const interacted = entity.onInteract(this);
 
                 if (interacted) {
+                    console.log(`Interaction successful with ${entity.displayName}`);
+
                     // Emit interact event
                     this.scene.events.emit(CONSTANTS.EVENTS.PLAYER_INTERACT, {
                         player: this,
@@ -164,8 +212,14 @@ class Player extends Entity {
                     });
 
                     return true;
+                } else {
+                    console.log(`Interaction failed with ${entity.displayName}`);
                 }
+            } else {
+                console.log(`Cannot interact with ${entity.displayName} from ${interactDirection}`);
             }
+        } else {
+            console.log(`No interactable entity found at ${frontPos.x}, ${frontPos.y}`);
         }
 
         return false;
@@ -199,6 +253,8 @@ class Player extends Entity {
      */
     addToInventory(item) {
         this.inventory.push(item);
+
+        console.log(`Added ${item.displayName} to inventory`);
 
         // Emit item pickup event
         this.scene.events.emit(CONSTANTS.EVENTS.ITEM_PICKUP, {

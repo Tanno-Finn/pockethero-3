@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>File Checker</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    .success { color: green; }
+    .error { color: red; }
+    .file-item { margin-bottom: 5px; }
+    #results { margin-top: 20px; border: 1px solid #ccc; padding: 10px; }
+    button { padding: 10px; margin: 10px 0; }
+  </style>
+</head>
+<body>
+<h1>Grid World Data File Checker</h1>
+<p>Click the button below to check if your data files are accessible:</p>
+
+<button id="checkFiles">Check Files</button>
+<div id="results"></div>
+
+<script>
+  document.getElementById('checkFiles').addEventListener('click', checkAllFiles);
+
+  const filesToCheck = [
+    'data/tiles/index.json',
+    'data/tiles/basic_tiles.json',
+    'data/entities/index.json',
+    'data/entities/basic_entities.json',
+    'data/zones/index.json',
+    'data/zones/demo_zones.json',
+    'data/interactions/index.json',
+    'data/interactions/basic_interactions.json'
+  ];
+
+  async function checkFile(path) {
+    try {
+      const response = await fetch(path);
+      if (!response.ok) {
+        return {
+          success: false,
+          status: response.status,
+          message: `HTTP error: ${response.status}`
+        };
+      }
+
+      // Try to parse as JSON to verify content
+      const data = await response.json();
+      return {
+        success: true,
+        data: data
+      };
+    } catch (error) {
+      return {
+        success: false,
+        message: error.toString()
+      };
+    }
+  }
+
+  async function checkAllFiles() {
+    const resultsDiv = document.getElementById('results');
+    resultsDiv.innerHTML = '<h2>Checking files...</h2>';
+
+    let resultsHtml = '';
+    let allSuccess = true;
+
+    for (const filePath of filesToCheck) {
+      resultsHtml += `<div class="file-item">Checking ${filePath}... `;
+
+      const result = await checkFile(filePath);
+
+      if (result.success) {
+        resultsHtml += `<span class="success">SUCCESS</span>`;
+
+        // Show a preview of the data
+        const dataPreview = JSON.stringify(result.data).substring(0, 100) + '...';
+        resultsHtml += `<br><small>Data preview: ${dataPreview}</small>`;
+      } else {
+        allSuccess = false;
+        resultsHtml += `<span class="error">FAILED: ${result.message}</span>`;
+      }
+
+      resultsHtml += `</div>`;
+    }
+
+    // Add summary
+    resultsHtml = `
+                <h2>Results Summary</h2>
+                <p>${allSuccess ?
+            '<span class="success">All files are accessible!</span>' :
+            '<span class="error">Some files are not accessible!</span>'}</p>
+                <h3>Detailed Results:</h3>
+            ` + resultsHtml;
+
+    resultsDiv.innerHTML = resultsHtml;
+  }
+</script>
+</body>
+</html>

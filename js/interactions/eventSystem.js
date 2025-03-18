@@ -134,4 +134,14 @@ class EventSystem {
     listenerCount(eventType) {
         return this.listeners[eventType] ? this.listeners[eventType].length : 0;
     }
+
+    /**
+     * Helper method to add compatibility with Phaser's event emitter
+     * Creates Phaser-like methods for event handling
+     */
+    addPhaserCompatibility() {
+        // Add Phaser-like event methods
+        this.on = this.subscribe.bind(this);
+        this.off = this.unsubscribe.bind(this);
+    }
 }

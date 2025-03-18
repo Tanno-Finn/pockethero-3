@@ -22,21 +22,5 @@
     "directions": ["north", "east", "south", "west"],
     "eventType": "container_open",
     "keyBinding": "E"
-  },
-  {
-    "id": "examine",
-    "displayName": "Examine",
-    "requiredTags": ["item"],
-    "directions": ["north", "east", "south", "west"],
-    "eventType": "examine",
-    "keyBinding": "E"
-  },
-  {
-    "id": "use",
-    "displayName": "Use",
-    "requiredTags": ["usable"],
-    "directions": ["north", "east", "south", "west"],
-    "eventType": "use_item",
-    "keyBinding": "E"
   }
 ]
