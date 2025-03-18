@@ -1,49 +1,81 @@
 # TODO List
 
-## Legend
-- Priority: [High/Medium/Low]
-- Status: [Backlog/In Progress/Testing/Complete]
-- Complexity: [Simple/Moderate/Complex]
+This document tracks planned features and improvements for the Grid World project.
 
-## Backlog
+## Priority Tasks
 
-### Core Engine
-- [ ] **Implement game loop** (Priority: High, Complexity: Moderate)
-  - Description: Create a basic game loop with fixed time step
-  - Dependencies: None
-  - Acceptance Criteria: Game runs at consistent frame rate
+### High Priority
+- [ ] **Implement inventory system** (Complexity: Medium)
+  - Create inventory UI
+  - Add inventory management functions
+  - Implement item use from inventory
 
-- [ ] **Create state management system** (Priority: High, Complexity: Moderate)
-  - Description: Implement central game state that can be safely accessed and modified
-  - Dependencies: Game loop
-  - Acceptance Criteria: State can be updated and read by various components
+- [ ] **Add saving and loading** (Complexity: High)
+  - Design save data structure
+  - Create save/load functions
+  - Add UI for save/load options
 
-### Rendering
-- [ ] **Set up canvas rendering** (Priority: High, Complexity: Simple)
-  - Description: Create basic canvas setup with proper scaling
-  - Dependencies: None
-  - Acceptance Criteria: Canvas renders at appropriate size on different screens
+- [ ] **Improve NPC behaviors** (Complexity: Medium)
+  - Add more sophisticated movement patterns
+  - Implement basic AI for NPCs
+  - Add more dialog options and conditionals
 
-- [ ] **Implement sprite rendering** (Priority: Medium, Complexity: Moderate)
-  - Description: Create system for loading and rendering sprite images
-  - Dependencies: Canvas rendering
-  - Acceptance Criteria: Sprites can be loaded and drawn to canvas
+### Medium Priority
+- [ ] **Implement quest system** (Complexity: High)
+  - Design quest data structure
+  - Create quest tracking
+  - Add quest log UI
+  - Implement quest rewards
 
-### Input System
-- [ ] **Create input manager** (Priority: Medium, Complexity: Simple)
-  - Description: Create system to capture keyboard and mouse/touch inputs
-  - Dependencies: None
-  - Acceptance Criteria: Input events are captured and normalized
+- [ ] **Enhance interaction system** (Complexity: Medium)
+  - Add more interaction types
+  - Implement context-sensitive interactions
+  - Add interaction feedback and effects
 
-## In Progress
+- [ ] **Add container system** (Complexity: Medium)
+  - Implement open/close functionality for containers
+  - Add item storage and retrieval
+  - Create container UI
 
-- [ ] **Project initialization** (Priority: High, Complexity: Simple)
-  - Description: Set up basic project structure and documentation
-  - Dependencies: None
-  - Acceptance Criteria: Repository is initialized with all required files
+### Low Priority
+- [ ] **Add sound effects and music** (Complexity: Low)
+  - Implement audio manager
+  - Add sound effects for interactions
+  - Add background music for different zones
 
-## Completed
+- [ ] **Enhance visual effects** (Complexity: Medium)
+  - Add particle effects
+  - Implement day/night cycle
+  - Add weather effects
 
-- [X] **Example completed task** (Priority: Medium, Complexity: Simple)
-  - Description: This is just a placeholder for the format
-  - Completed: YYYY-MM-DD
+- [ ] **Optimize performance** (Complexity: High)
+  - Implement entity pooling
+  - Add spatial partitioning for large zones
+  - Optimize rendering pipeline
+
+## Completed Tasks
+
+### Session 1 (2025-03-18)
+- [x] Set up initial project structure
+- [x] Implement grid-based world system
+- [x] Create entity system with player, NPCs, and items
+- [x] Implement basic movement and collision detection
+- [x] Create interaction system with direction-based interactions
+- [x] Implement teleporters between zones
+- [x] Add dialog system for NPC conversations
+- [x] Create simple rendering using basic shapes
+- [x] Add camera system that follows the player
+- [x] Implement data-driven design with JSON configuration
+- [x] Create demo content with 2 zones (village and forest)
+
+## Bug Fixes Needed
+- [ ] Fix camera edge behavior when approaching zone boundaries
+- [ ] Fix entity overlap when multiple entities are on the same tile
+- [ ] Address teleportation edge cases
+- [ ] Fix dialog system interaction with other game systems
+
+## Technical Debt
+- [ ] Refactor entity class hierarchy for better extensibility
+- [ ] Improve data validation for JSON files
+- [ ] Add unit tests for core systems
+- [ ] Create documentation for entity and tile creation

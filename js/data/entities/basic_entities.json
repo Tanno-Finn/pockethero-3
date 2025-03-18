@@ -1,0 +1,94 @@
+[
+  {
+    "id": "player",
+    "displayName": "Player",
+    "type": "player",
+    "color": "#0000FF",
+    "shape": "circle",
+    "size": 0.8,
+    "tags": ["character", "controllable"],
+    "properties": {
+      "movementSpeed": 1
+    }
+  },
+  {
+    "id": "villager",
+    "displayName": "Villager",
+    "type": "npc",
+    "color": "#FF0000",
+    "shape": "circle",
+    "size": 0.8,
+    "interactable": true,
+    "tags": ["character", "npc", "villager"],
+    "dialog": "Hello there! Welcome to our village.",
+    "properties": {
+      "movementSpeed": 1
+    }
+  },
+  {
+    "id": "merchant",
+    "displayName": "Merchant",
+    "type": "npc",
+    "color": "#FF6600",
+    "shape": "circle",
+    "size": 0.8,
+    "interactable": true,
+    "tags": ["character", "npc", "merchant"],
+    "dialog": {
+      "text": "I have many wares to sell! But this is just a prototype, so check back later.",
+      "speaker": "Merchant"
+    },
+    "properties": {
+      "movementSpeed": 1
+    }
+  },
+  {
+    "id": "potion",
+    "displayName": "Health Potion",
+    "type": "item",
+    "color": "#FF00FF",
+    "shape": "rectangle",
+    "size": 0.5,
+    "interactable": true,
+    "pickupable": true,
+    "tags": ["item", "collectible", "consumable"],
+    "useEffect": {
+      "type": "heal",
+      "amount": 10
+    },
+    "dialogOnPickup": "You picked up a Health Potion!",
+    "properties": {
+      "value": 5
+    }
+  },
+  {
+    "id": "key",
+    "displayName": "Key",
+    "type": "item",
+    "color": "#FFFF00",
+    "shape": "rectangle",
+    "size": 0.5,
+    "interactable": true,
+    "pickupable": true,
+    "tags": ["item", "collectible", "key"],
+    "dialogOnPickup": "You found a key! This might open something.",
+    "properties": {
+      "value": 10
+    }
+  },
+  {
+    "id": "chest",
+    "displayName": "Treasure Chest",
+    "type": "furniture",
+    "color": "#A0522D",
+    "shape": "rectangle",
+    "size": 0.8,
+    "interactable": true,
+    "tags": ["furniture", "container"],
+    "interactionDirections": ["north", "east", "south", "west"],
+    "properties": {
+      "isOpen": false,
+      "contents": ["key"]
+    }
+  }
+]

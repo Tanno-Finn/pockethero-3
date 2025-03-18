@@ -1,0 +1,89 @@
+[
+  {
+    "id": "village",
+    "displayName": "Village",
+    "width": 20,
+    "height": 15,
+    "defaultTile": "grass",
+    "tiles": [
+      { "x": 5, "y": 7, "type": "water" },
+      { "x": 6, "y": 7, "type": "water" },
+      { "x": 7, "y": 7, "type": "water" },
+      { "x": 8, "y": 7, "type": "water" },
+      { "x": 9, "y": 7, "type": "water" },
+      { "x": 10, "y": 7, "type": "water" },
+      { "x": 11, "y": 7, "type": "water" },
+      { "x": 12, "y": 7, "type": "water" },
+      { "x": 13, "y": 7, "type": "water" },
+      { "x": 14, "y": 7, "type": "water" },
+      { "x": 15, "y": 7, "type": "water" },
+
+      { "x": 3, "y": 2, "type": "forest" },
+      { "x": 4, "y": 2, "type": "forest" },
+      { "x": 3, "y": 3, "type": "forest" },
+      { "x": 4, "y": 3, "type": "forest" },
+      { "x": 5, "y": 3, "type": "forest" },
+
+      { "x": 16, "y": 10, "type": "rock" },
+      { "x": 17, "y": 10, "type": "rock" },
+      { "x": 16, "y": 11, "type": "rock" },
+      { "x": 17, "y": 11, "type": "rock" },
+
+      { "x": 19, "y": 10, "type": "teleporter", "properties": {
+        "targetZone": "forest",
+        "targetX": 1,
+        "targetY": 10
+      }}
+    ],
+    "entities": [
+      { "x": 10, "y": 4, "type": "npc", "id": "villager" },
+      { "x": 5, "y": 11, "type": "npc", "id": "merchant" },
+      { "x": 15, "y": 12, "type": "item", "id": "potion" },
+      { "x": 13, "y": 2, "type": "furniture", "id": "chest" }
+    ]
+  },
+  {
+    "id": "forest",
+    "displayName": "Forest",
+    "width": 20,
+    "height": 15,
+    "defaultTile": "forest",
+    "tiles": [
+      { "x": 3, "y": 5, "type": "grass" },
+      { "x": 4, "y": 5, "type": "grass" },
+      { "x": 5, "y": 5, "type": "grass" },
+      { "x": 3, "y": 6, "type": "grass" },
+      { "x": 4, "y": 6, "type": "grass" },
+      { "x": 5, "y": 6, "type": "grass" },
+      { "x": 3, "y": 7, "type": "grass" },
+      { "x": 4, "y": 7, "type": "grass" },
+      { "x": 5, "y": 7, "type": "grass" },
+
+      { "x": 10, "y": 8, "type": "water" },
+      { "x": 11, "y": 8, "type": "water" },
+      { "x": 12, "y": 8, "type": "water" },
+      { "x": 10, "y": 9, "type": "water" },
+      { "x": 11, "y": 9, "type": "water" },
+      { "x": 12, "y": 9, "type": "water" },
+
+      { "x": 15, "y": 2, "type": "rock" },
+      { "x": 16, "y": 2, "type": "rock" },
+      { "x": 17, "y": 2, "type": "rock" },
+      { "x": 15, "y": 3, "type": "rock" },
+      { "x": 16, "y": 3, "type": "rock" },
+      { "x": 17, "y": 3, "type": "rock" },
+
+      { "x": 1, "y": 10, "type": "teleporter", "properties": {
+        "targetZone": "village",
+        "targetX": 19,
+        "targetY": 10
+      }}
+    ],
+    "entities": [
+      { "x": 4, "y": 6, "type": "item", "id": "key" },
+      { "x": 15, "y": 10, "type": "npc", "id": "villager", "properties": {
+        "dialog": "Be careful in this forest! There are hidden treasures to find."
+      }}
+    ]
+  }
+]

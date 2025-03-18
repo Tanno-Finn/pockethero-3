@@ -1,0 +1,57 @@
+[
+  {
+    "id": "grass",
+    "displayName": "Grass",
+    "type": "grass",
+    "color": "#7CFC00",
+    "shape": "rectangle",
+    "tags": ["passable", "natural"],
+    "properties": {
+      "movementCost": 1
+    }
+  },
+  {
+    "id": "forest",
+    "displayName": "Forest",
+    "type": "forest",
+    "color": "#228B22",
+    "shape": "rectangle",
+    "tags": ["passable", "natural", "slow"],
+    "properties": {
+      "movementCost": 2
+    }
+  },
+  {
+    "id": "water",
+    "displayName": "Water",
+    "type": "water",
+    "color": "#1E90FF",
+    "shape": "rectangle",
+    "tags": ["blocking", "natural", "water"],
+    "properties": {
+      "movementCost": 0
+    }
+  },
+  {
+    "id": "rock",
+    "displayName": "Rock",
+    "type": "rock",
+    "color": "#A9A9A9",
+    "shape": "rectangle",
+    "tags": ["blocking", "natural"],
+    "properties": {
+      "movementCost": 0
+    }
+  },
+  {
+    "id": "teleporter",
+    "displayName": "Teleporter",
+    "type": "teleporter",
+    "color": "#800080",
+    "shape": "rectangle",
+    "tags": ["passable", "teleporter"],
+    "properties": {
+      "movementCost": 1
+    }
+  }
+]
